@@ -16,18 +16,32 @@
 // })
 
 import express from "express";
+import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './config/swagger';
+import authRoutes from './routes/authRoutes';
+import { connectDB } from "./config/database";
+import morgan from "morgan";
+import cors from "cors";
 
+dotenv.config();
 const app = express();
 
 const port = 3000;
+app.use(cors());
+app.use(express.json());
+app.use(morgan('dev'));
 
 app.listen(port,()=>{
     console.log(`Server is running at ${port}`);
 })
 
-app.get("/",(req,res)=>{
-    res.status(200).json({message: "Hello from server!"});
-})
+app.use('/docs',swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/api/auth", authRoutes);
+
+
+connectDB();
+
 
 //MVC - Model View Controller
 //M - Data/Model - handle data logic
